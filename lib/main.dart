@@ -303,12 +303,114 @@ class BankCardWidget extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          // _buildCardTop(),
-          // _buildBalanceDisplay(),
-          // _buildCardNumber(),
-          // _buildCardDetails(),
+          _buildCardTop(),
+          _buildBalanceDisplay(),
+          _buildCardNumber(),
+          _buildCardDetails(),
         ],
       ),
     );
   }
+
+  Widget _buildCardTop() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Icon(Icons.credit_card, size: 40, color: Colors.yellow[800]),
+        const Text(
+          'VISA',
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 28,
+            fontStyle: FontStyle.italic,
+            fontWeight: FontWeight.w900,
+            shadows: [
+              Shadow(
+                blurRadius: 5,
+                color: Colors.black54,
+                offset: Offset(1, 1),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildBalanceDisplay() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: const [
+        Text(
+          'Available Balance',
+          style: TextStyle(color: Colors.white70, fontSize: 12),
+        ),
+        SizedBox(height: 4),
+        Text(
+          '\$1, 234.50',
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 28,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildCardNumber() {
+    return const Text(
+      '**** **** **** 1234',
+      style: TextStyle(
+        color: Colors.white,
+        fontSize: 18,
+        fontWeight: FontWeight.bold,
+        letterSpacing: 4,
+      ),
+    );
+  }
+
+  Widget _buildCardDetails() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: const [
+            Text(
+              'Card Holder',
+              style: TextStyle(color: Colors.white70, fontSize: 12),
+            ),
+            Text(
+              'EDDY GONZALES',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
+        ),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: const [
+            Text(
+              'Expires',
+              style: TextStyle(color: Colors.white70, fontSize: 12),
+            ),
+            Text(
+              '12/26',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
 }
+
+// 7. ACTION GRID
