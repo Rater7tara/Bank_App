@@ -194,7 +194,7 @@ class _HomePageContent extends StatelessWidget {
           HeaderSection(),
           BankCardWidget(),
           ActionGridSection(),
-          // TransactionHistorySection(),
+          TransactionHistorySection(),
         ],
       ),
     );
@@ -531,4 +531,94 @@ class ActionButton extends StatelessWidget {
   }
 }
 
-// 8. Transaction History
+// 8. Transaction History Section
+class TransactionHistorySection extends StatelessWidget {
+  const TransactionHistorySection({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: Colors.white,
+      margin: const EdgeInsets.only(top: 4),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        child: Column(
+          children: [
+            _buildSectionHeader(),
+            const SizedBox(height: 10),
+            Column(
+              children: List.generate(5, (index) => const TransactionRow()),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// Section header with see all buttons
+Widget _buildSectionHeader() {
+  return Row(
+    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    children: [
+      const Text(
+        'Transaction History',
+        style: TextStyle(
+          fontSize: 18,
+          color: Colors.black,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+      TextButton(
+        onPressed: () {},
+        child: const Text(
+          'See All',
+          style: TextStyle(
+            fontSize: 16,
+            color: primaryColor,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ),
+    ],
+  );
+}
+
+// Single Transaction row
+class TransactionRow extends StatelessWidget {
+  const TransactionRow({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 10),
+      child: Row(
+        children: [
+          _buildIconPlaceholder(),
+          const SizedBox(width: 15),
+          // _buildDetailsPlaceholder(),
+          // const SkeletonContainer(width: 70, height: 16, radius: 4),
+        ],
+      ),
+    );
+  }
+}
+
+// Transaction icon placeholder
+Widget _buildIconPlaceholder() {
+  return Container(
+    padding: const EdgeInsets.all(12),
+    decoration: BoxDecoration(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(12),
+      boxShadow: [
+        BoxShadow(
+          color: Colors.grey.withOpacity(0.2),
+          spreadRadius: 1,
+          blurRadius: 3,
+          offset: const Offset(0, 1),
+        ),
+      ],
+    ),
+  );
+}
