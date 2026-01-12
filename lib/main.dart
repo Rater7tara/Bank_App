@@ -20,8 +20,8 @@ class MyApp extends StatelessWidget {
 }
 
 // 2. Design Constants
-const Color primaryColor = Color(0xFF1E3A8A);
-const Color secondaryColor = Color(0xFF4C1D95);
+const Color primaryColor = Colors.deepPurple;
+const Color secondaryColor = Colors.deepPurpleAccent;
 
 // Data Model for action grid buttons
 class ActionItem {
@@ -596,8 +596,8 @@ class TransactionRow extends StatelessWidget {
         children: [
           _buildIconPlaceholder(),
           const SizedBox(width: 15),
-          // _buildDetailsPlaceholder(),
-          // const SkeletonContainer(width: 70, height: 16, radius: 4),
+          _buildDetailsPlaceholder(),
+          const SkeletonContainer(width: 70, height: 16, radius: 4),
         ],
       ),
     );
@@ -620,5 +620,46 @@ Widget _buildIconPlaceholder() {
         ),
       ],
     ),
+    child: const SkeletonContainer(width: 24, height: 16, radius: 4),
   );
+}
+
+// Transaction detail placeholder(title & category)
+Widget _buildDetailsPlaceholder() {
+  return Expanded(
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SkeletonContainer(width: 120, height: 16, radius: 4),
+        SizedBox(height: 5),
+        SkeletonContainer(width: 80, height: 14, radius: 4),
+      ],
+    ),
+  );
+}
+
+// 9. Utility Widget
+class SkeletonContainer extends StatelessWidget {
+  final double width;
+  final double height;
+  final double radius;
+
+  const SkeletonContainer({
+    super.key,
+    required this.width,
+    required this.height,
+    this.radius = 8,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: width,
+      height: height,
+      decoration: BoxDecoration(
+        color: Colors.grey[300],
+        borderRadius: BorderRadius.circular(radius),
+      ),
+    );
+  }
 }
