@@ -6,7 +6,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 //  1. App entry point
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform
@@ -49,7 +49,7 @@ class AuthWrapper extends StatelessWidget {
 
         // if user is logged in, show home screen
         if (snapshot.hasData && snapshot.data != null) {
-          return const AuthScreen();
+          return const MyHomePage();
         }
 
         // if user is not logged in, show home screen
