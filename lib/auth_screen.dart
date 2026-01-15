@@ -1,6 +1,6 @@
-import 'package:banking_app/firebase_options.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 const Color primaryColor = Colors.deepPurple;
 const Color secondaryColor = Colors.deepPurpleAccent;
@@ -94,6 +94,24 @@ class _AuthScreenState extends State<AuthScreen> {
         await userCredential.user?.updateDisplayName(
           _nameController.text.trim(),
         );
+
+        // Save user details to firebase
+        if (userCredential.user != null) {
+          // get a reference to the "users" collection
+          final userRef = FirebaseFirestore.instance
+              .collection('users')
+              .doc(userCredential.user!.uid);
+
+          // Data to save for the new user
+          await userRef.set({
+            'uid': userCredential.user!.uid,
+            'email': _emailController.text.trim(),
+            'name': _nameController.text.trim(), //Stored from the sign
+            'account_balance': 0.0, //Default initial balance
+            'card_number_suffix': '1234', //Default for display on home screen
+          });
+        }
+
         _showSuccessSnackbar('Account Created Successfully');
       }
     } on FirebaseException catch (e) {

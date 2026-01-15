@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 // 2. Design Constants
 const Color primaryColor = Colors.deepPurple;
@@ -164,17 +165,105 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 }
 
-// 4. Page Content Layout
+// 4. Page Content Layout (modified for data fetching)
 class _HomePageContent extends StatelessWidget {
-  const _HomePageContent({super.key});
+  const _HomePageContent();
+
+  // single function to fetch user data
+  Future<Map<String, dynamic>?> _fetchUserData() async {
+    final User? user = FirebaseAuth.instance.currentUser;
+    if (user == null) return null;
+
+    // fetch the document using the current user's UID
+    final docSnapshot = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(user.uid)
+        .get();
+
+    return docSnapshot.data();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return const SingleChildScrollView(
+    // use futureBuilder to fetch data once
+    return FutureBuilder<Map<String, dynamic>?>(
+      future: _fetchUserData(),
+      builder: (context, snapshot) {
+        // handel loading state
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(
+            child: Padding(
+              padding: EdgeInsetsGeometry.only(top: 100),
+              child: CircularProgressIndicator(color: primaryColor),
+            ),
+          );
+        }
+
+        // handel error/no data state
+        if (!snapshot.hasData || snapshot.hasError || snapshot.data == null) {
+          // fallback data if no firestore data is found (e.g., deleted user document)
+          const fallbackName = 'Guest';
+          const fallbackBalance = '0.00';
+          const fallbackCardSuffix = 'XXXX';
+
+          if (snapshot.hasError) {
+            print('Error fetching user.data ${snapshot.error}');
+          }
+
+          // render the UI with fallback data
+          return _buildContent(
+            name: fallbackName,
+            balance: fallbackBalance,
+            cardNumberSuffix: fallbackCardSuffix,
+          );
+        }
+
+        // Extract data safely when available
+        final userData = snapshot.data!;
+        // default to a safe value if the field is missing
+        final name = userData['name'] ?? 'User';
+        // Format balance to 2 decimal places, default is '0.00'
+        final balance = (userData['account_balance'] is num)
+            ? (userData['account_balance'] as num).toStringAsFixed(2)
+            : '0.00';
+        final cardNumberSuffix = userData['card_number_suffix'] ?? 'XXXX';
+
+        // build content, passing dynamic data
+        return _buildContent(
+          name: name,
+          balance: balance,
+          cardNumberSuffix: cardNumberSuffix,
+        );
+      },
+    );
+    // return const SingleChildScrollView(
+    //   child: Column(
+    //     children: [
+    //       HeaderSection(),
+    //       BankCardWidget(),
+    //       ActionGridSection(),
+    //       TransactionHistorySection(),
+    //     ],
+    //   ),
+    // );
+  }
+
+  // helper method to build the main scrollable content \
+  Widget _buildContent({
+    required String name,
+    required String balance,
+    required String cardNumberSuffix,
+  }) {
+    return SingleChildScrollView(
       child: Column(
         children: [
-          HeaderSection(),
-          BankCardWidget(),
+          // Pass dynamic data to children
+          HeaderSection(name: name),
+          BankCardWidget(
+            name: name,
+            balance: balance,
+            cardNumberSuffix: cardNumberSuffix,
+          ),
           ActionGridSection(),
           TransactionHistorySection(),
         ],
@@ -184,10 +273,11 @@ class _HomePageContent extends StatelessWidget {
 }
 
 // 5. HEADER SECTION
-// Top section with gradient brackground and greeting
+// Top section with gradient background and greeting
 
 class HeaderSection extends StatelessWidget {
-  const HeaderSection({super.key});
+  final String name; //new parameter for dynamic data
+  const HeaderSection({super.key, required this.name}); //Updated construction
 
   @override
   Widget build(BuildContext context) {
@@ -284,14 +374,14 @@ class HeaderSection extends StatelessWidget {
         const SizedBox(width: 8),
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: const [
-            Text(
+          children: [
+            const Text(
               'Good Morning',
               style: TextStyle(color: Colors.white70, fontSize: 14),
             ),
             Text(
-              'Mr Eddy Gonzales',
-              style: TextStyle(
+              name,
+              style: const TextStyle(
                 color: Colors.white,
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
@@ -306,10 +396,19 @@ class HeaderSection extends StatelessWidget {
 
 // 6. Bank card Widget
 class BankCardWidget extends StatelessWidget {
-  const BankCardWidget({super.key});
+  final String name;
+  final String balance;
+  final String cardNumberSuffix;
+
+  const BankCardWidget({
+    super.key,
+    required this.name,
+    required this.balance,
+    required this.cardNumberSuffix,
+  });
 
   @override
-  Widget build(BuildContext) {
+  Widget build(BuildContext context) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
       padding: const EdgeInsets.all(20),
@@ -377,14 +476,14 @@ class BankCardWidget extends StatelessWidget {
   Widget _buildBalanceDisplay() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      children: const [
+      children: [
         Text(
           'Available Balance',
           style: TextStyle(color: Colors.white70, fontSize: 12),
         ),
         SizedBox(height: 4),
         Text(
-          '\$1, 234.50',
+          '\$$balance',
           style: TextStyle(
             color: Colors.white,
             fontSize: 28,
@@ -396,8 +495,8 @@ class BankCardWidget extends StatelessWidget {
   }
 
   Widget _buildCardNumber() {
-    return const Text(
-      '**** **** **** 1234',
+    return Text(
+      '**** **** **** $cardNumberSuffix',
       style: TextStyle(
         color: Colors.white,
         fontSize: 18,
@@ -413,13 +512,13 @@ class BankCardWidget extends StatelessWidget {
       children: [
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: const [
+          children: [
             Text(
               'Card Holder',
               style: TextStyle(color: Colors.white70, fontSize: 12),
             ),
             Text(
-              'EDDY GONZALES',
+              name.toUpperCase(),
               style: TextStyle(
                 color: Colors.white,
                 fontSize: 16,
