@@ -4,13 +4,12 @@ import 'home_screen.dart';
 import 'auth_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'qr_payment.dart';
 
 //  1. App entry point
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform
-  );
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   runApp(const MyApp());
 }
 
@@ -25,6 +24,12 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(primarySwatch: Colors.blue, fontFamily: 'Roboto'),
       debugShowCheckedModeBanner: false,
       home: const AuthWrapper(),
+
+      // Add named routes here
+      routes: {
+        '/home': (context) => const MyHomePage(),
+        '/qr_payment': (context) => const QrPaymentPage(),
+      },
     );
   }
 }
@@ -41,9 +46,7 @@ class AuthWrapper extends StatelessWidget {
         // Show loading indicator while checking auth state
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Scaffold(
-            body: Center(
-              child: CircularProgressIndicator(),
-            ),
+            body: Center(child: CircularProgressIndicator()),
           );
         }
 
@@ -54,7 +57,7 @@ class AuthWrapper extends StatelessWidget {
 
         // if user is not logged in, show home screen
         return const AuthScreen();
-      }
+      },
     );
   }
 }
